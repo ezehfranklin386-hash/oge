@@ -1,0 +1,15 @@
+Uncaught Error: supabaseUrl is required.
+    at validateSupabaseUrl (@supabase_supabase-js.js?v=33733c22:20447:26)
+    at new SupabaseClient (@supabase_supabase-js.js?v=33733c22:20679:21)
+    at createClient (@supabase_supabase-js.js?v=33733c22:20923:10)
+    at createClient (client.ts:7:10)
+    at AuthProvider (AuthContext.tsx:26:20)
+    at Object.react_stack_bottom_frame (react-dom_client.js?v=2d72769b:20259:20)
+    at renderWithHooks (react-dom_client.js?v=2d72769b:5918:24)
+    at updateFunctionComponent (react-dom_client.js?v=2d72769b:7763:21)
+    at beginWork (react-dom_client.js?v=2d72769b:8843:20)
+    at runWithFiberInDEV (react-dom_client.js?v=2d72769b:1133:72)
+react-dom_client.js?v=2d72769b:7241 An error occurred in the <AuthProvider> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
