@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Star, Search, Plus, Pencil, Trash2 } from "lucide-react";
 import { listProperties, createProperty, updateProperty, deleteProperty } from "@/lib/supabase/queries";
+import { deleteImagesByUrls, isStorageUrl } from "@/lib/supabase/storage";
 import { SEED_PROPERTIES } from "@/lib/supabase/seed-data";
 import { formatNGN } from "@/lib/utils/currency";
 import NoImagePlaceholder from "@/components/ui/NoImagePlaceholder";
@@ -57,6 +58,9 @@ export default function AdminProperties() {
   async function handleDelete() {
     if (deleting && deleting.id && !deleting.id.startsWith("seed-")) {
       await deleteProperty(deleting.id);
+      // Best-effort cleanup of storage objects owned by this property.
+      // isStorageUrl filters out pasted external URLs (Unsplash etc.).
+      void deleteImagesByUrls((deleting.images || []).filter(isStorageUrl));
     }
     setDeleting(null);
     load();

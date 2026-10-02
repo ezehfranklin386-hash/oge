@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Phone, Plus, Pencil, Trash2 } from "lucide-react";
 import { createAgent, updateAgent, deleteAgent } from "@/lib/supabase/queries";
+import { deleteImageByUrl } from "@/lib/supabase/storage";
 import { getAgents } from "@/lib/supabase/data";
 import AgentForm from "@/components/forms/AgentForm";
 import type { Agent } from "@/lib/supabase/queries";
@@ -30,6 +31,9 @@ export default function AdminAgents() {
   async function handleDelete() {
     if (deleting && deleting.id && !deleting.id.startsWith("seed-")) {
       await deleteAgent(deleting.id);
+      // Best-effort cleanup of the storage object behind this photo.
+      // deleteImageByUrl ignores non-storage URLs internally.
+      if (deleting.photo_url) void deleteImageByUrl(deleting.photo_url);
     }
     setDeleting(null);
     load();
