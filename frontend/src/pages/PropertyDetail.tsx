@@ -4,7 +4,7 @@ import { Phone, MessageCircle } from "lucide-react";
 import { getPropertyBySlug } from "@/lib/supabase/queries";
 import { SEED_PROPERTIES } from "@/lib/supabase/seed-data";
 import { formatNGN } from "@/lib/utils/currency";
-import { whatsappLink } from "@/lib/utils/constants";
+import { useSettings, getWhatsappLink } from "@/contexts/SettingsContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import LeadForm from "@/components/forms/LeadForm";
@@ -15,6 +15,7 @@ import type { Property } from "@/lib/supabase/queries";
 
 export default function PropertyDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const { settings } = useSettings();
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -211,7 +212,7 @@ export default function PropertyDetail() {
 
             {/* Quick actions */}
             <div className="mt-6 flex flex-col gap-2">
-              <a href={whatsappLink(property.title)} target="_blank" rel="noopener noreferrer">
+              <a href={getWhatsappLink(settings, property.title)} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="w-full">
                   Share on WhatsApp
                 </Button>

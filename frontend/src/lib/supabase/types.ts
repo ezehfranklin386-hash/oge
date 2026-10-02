@@ -87,6 +87,14 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "properties_agent_id_fkey";
+            columns: ["agent_id"];
+            referencedRelation: "agents";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       leads: {
         Row: {
@@ -122,6 +130,14 @@ export interface Database {
           status?: string;
           created_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "leads_property_id_fkey";
+            columns: ["property_id"];
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       agents: {
         Row: {
@@ -163,6 +179,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       testimonials: {
         Row: {
@@ -192,8 +209,94 @@ export interface Database {
           approved?: boolean;
           created_at?: string;
         };
+        Relationships: [];
+      };
+      site_settings: {
+        Row: {
+          id: string;
+          phone: string | null;
+          phone_raw: string | null;
+          phone2: string | null;
+          phone2_raw: string | null;
+          whatsapp: string | null;
+          whatsapp_raw: string | null;
+          email: string | null;
+          address: string | null;
+          address_full: string | null;
+          instagram: string | null;
+          facebook: string | null;
+          twitter: string | null;
+          linkedin: string | null;
+          tiktok: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          phone?: string | null;
+          phone_raw?: string | null;
+          phone2?: string | null;
+          phone2_raw?: string | null;
+          whatsapp?: string | null;
+          whatsapp_raw?: string | null;
+          email?: string | null;
+          address?: string | null;
+          address_full?: string | null;
+          instagram?: string | null;
+          facebook?: string | null;
+          twitter?: string | null;
+          linkedin?: string | null;
+          tiktok?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          phone?: string | null;
+          phone_raw?: string | null;
+          phone2?: string | null;
+          phone2_raw?: string | null;
+          whatsapp?: string | null;
+          whatsapp_raw?: string | null;
+          email?: string | null;
+          address?: string | null;
+          address_full?: string | null;
+          instagram?: string | null;
+          facebook?: string | null;
+          twitter?: string | null;
+          linkedin?: string | null;
+          tiktok?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      admins: {
+        Row: {
+          user_id: string;
+          email: string | null;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          email?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          email?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
       };
     };
+    Views: { [_ in never]: never };
     Enums: Record<string, never>;
+    Functions: {
+      is_admin: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+    };
   };
 }

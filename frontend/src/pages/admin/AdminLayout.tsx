@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { COMPANY } from "@/lib/utils/constants";
 import { useState } from "react";
-import { LayoutDashboard, Home, ClipboardList, Users, Star, LogOut, Globe } from "lucide-react";
+import { LayoutDashboard, Home, ClipboardList, Users, Star, LogOut, Globe, Settings } from "lucide-react";
 
 const sidebarLinks = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -10,6 +10,7 @@ const sidebarLinks = [
   { label: "Leads", href: "/admin/leads", icon: ClipboardList },
   { label: "Agents", href: "/admin/agents", icon: Users },
   { label: "Testimonials", href: "/admin/testimonials", icon: Star },
+  { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminLayout() {

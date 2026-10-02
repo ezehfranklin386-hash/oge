@@ -17,6 +17,7 @@ import AdminProperties from "./pages/admin/AdminProperties";
 import AdminLeads from "./pages/admin/AdminLeads";
 import AdminAgents from "./pages/admin/AdminAgents";
 import AdminTestimonials from "./pages/admin/AdminTestimonials";
+import AdminSettings from "./pages/admin/AdminSettings";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 function PageTransition({ children }: { children: React.ReactNode }) {
@@ -82,6 +83,7 @@ export default function App() {
         <Route path="leads" element={<AdminLeads />} />
         <Route path="agents" element={<AdminAgents />} />
         <Route path="testimonials" element={<AdminTestimonials />} />
+        <Route path="settings" element={<AdminSettings />} />
       </Route>
     </Routes>
   );

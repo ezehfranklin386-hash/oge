@@ -1,4 +1,14 @@
 import { getSupabase } from "./client";
+import type { Database } from "./types";
+
+type PropertyInsert = Database["public"]["Tables"]["properties"]["Insert"];
+type PropertyUpdate = Database["public"]["Tables"]["properties"]["Update"];
+type AgentInsert = Database["public"]["Tables"]["agents"]["Insert"];
+type AgentUpdate = Database["public"]["Tables"]["agents"]["Update"];
+type TestimonialInsert = Database["public"]["Tables"]["testimonials"]["Insert"];
+type TestimonialUpdate = Database["public"]["Tables"]["testimonials"]["Update"];
+type LeadInsert = Database["public"]["Tables"]["leads"]["Insert"];
+type SiteSettingsInsert = Database["public"]["Tables"]["site_settings"]["Insert"];
 
 export interface PropertyFilters {
   q?: string;
@@ -10,6 +20,11 @@ export interface PropertyFilters {
   city_area?: string;
   sort?: string;
   page?: string;
+}
+
+export interface ListOptions {
+  /** Admin views: return every status, not just 'available'. */
+  allStatuses?: boolean;
 }
 
 export interface Property {
@@ -57,6 +72,8 @@ export interface Testimonial {
   text: string;
   rating: number;
   property_ref: string | null;
+  approved: boolean;
+  created_at: string;
 }
 
 export interface Lead {
@@ -74,7 +91,7 @@ export interface Lead {
 
 const PER_PAGE = 9;
 
-export async function listProperties(filters: PropertyFilters) {
+export async function listProperties(filters: PropertyFilters, opts?: ListOptions) {
   const supabase = getSupabase();
   const page = Math.max(1, parseInt(filters.page || "1", 10));
   const from = (page - 1) * PER_PAGE;
@@ -82,8 +99,12 @@ export async function listProperties(filters: PropertyFilters) {
 
   let query = supabase
     .from("properties")
-    .select("*, agents(name, phone, whatsapp, photo_url)", { count: "exact" })
-    .eq("status", "available");
+    .select("*, agents(name, phone, whatsapp, photo_url)", { count: "exact" });
+
+  // Public views only see 'available'; the admin list opts out of this filter.
+  if (!opts?.allStatuses) {
+    query = query.eq("status", "available");
+  }
 
   if (filters.q) {
     query = query.or(
@@ -192,7 +213,7 @@ export async function submitLead(lead: {
   source?: string;
 }) {
   const supabase = getSupabase();
-  const { error } = await supabase.from("leads").insert({
+  const row: LeadInsert = {
     property_id: lead.property_id || null,
     name: lead.name,
     phone: lead.phone,
@@ -200,6 +221,133 @@ export async function submitLead(lead: {
     message: lead.message || null,
     source: lead.source || "property",
     status: "new",
-  } as any);
+  };
+  const { error } = await supabase.from("leads").insert(row);
+  if (error) throw error;
+}
+
+export async function updateLeadStatus(id: string, status: "new" | "contacted" | "closed") {
+  const supabase = getSupabase();
+  const { error } = await supabase.from("leads").update({ status }).eq("id", id);
+  if (error) throw error;
+}
+
+// Settings helpers
+
+export async function getSiteSettings() {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from("site_settings")
+    .select("*")
+    .eq("id", "main")
+    .single();
+
+  if (error && error.code !== "PGRST116") throw error;
+  return data;
+}
+
+export async function updateSiteSettings(settings: {
+  phone?: string;
+  phoneRaw?: string;
+  phone2?: string;
+  phone2Raw?: string;
+  whatsapp?: string;
+  whatsappRaw?: string;
+  email?: string;
+  address?: string;
+  addressFull?: string;
+  instagram?: string;
+  facebook?: string;
+  twitter?: string;
+  linkedin?: string;
+  tiktok?: string;
+}) {
+  const supabase = getSupabase();
+  // updated_at is owned by the DB trigger (set_updated_at) — not set here.
+  const row: SiteSettingsInsert = {
+    id: "main",
+    phone: settings.phone,
+    phone_raw: settings.phoneRaw,
+    phone2: settings.phone2 || null,
+    phone2_raw: settings.phone2Raw || null,
+    whatsapp: settings.whatsapp,
+    whatsapp_raw: settings.whatsappRaw,
+    email: settings.email,
+    address: settings.address,
+    address_full: settings.addressFull,
+    instagram: settings.instagram || null,
+    facebook: settings.facebook || null,
+    twitter: settings.twitter || null,
+    linkedin: settings.linkedin || null,
+    tiktok: settings.tiktok || null,
+  };
+  const { error } = await supabase.from("site_settings").upsert(row);
+  if (error) throw error;
+}
+
+// ── Property CRUD ───────────────────────────────────────────────
+
+export async function createProperty(data: Partial<Property>) {
+  const supabase = getSupabase();
+  // `agents` is a read-only join field, not a column — strip it before insert.
+  const { agents: _agents, ...row } = data;
+  const { error } = await supabase.from("properties").insert(row as PropertyInsert);
+  if (error) throw error;
+}
+
+export async function updateProperty(id: string, data: Partial<Property>) {
+  const supabase = getSupabase();
+  // `agents` is a read-only join field, not a column — strip it before update.
+  const { agents: _agents, ...row } = data;
+  const { error } = await supabase.from("properties").update(row as PropertyUpdate).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteProperty(id: string) {
+  const supabase = getSupabase();
+  const { error } = await supabase.from("properties").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ── Agent CRUD ──────────────────────────────────────────────────
+
+export async function createAgent(data: Partial<Agent>) {
+  const supabase = getSupabase();
+  const { error } = await supabase.from("agents").insert(data as AgentInsert);
+  if (error) throw error;
+}
+
+export async function updateAgent(id: string, data: Partial<Agent>) {
+  const supabase = getSupabase();
+  const { error } = await supabase.from("agents").update(data as AgentUpdate).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteAgent(id: string) {
+  const supabase = getSupabase();
+  const { error } = await supabase.from("agents").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ── Testimonial CRUD ────────────────────────────────────────────
+
+export async function createTestimonial(data: Partial<Testimonial>) {
+  const supabase = getSupabase();
+  const { error } = await supabase.from("testimonials").insert(data as TestimonialInsert);
+  if (error) throw error;
+}
+
+export async function updateTestimonial(id: string, data: Partial<Testimonial>) {
+  const supabase = getSupabase();
+  const { error } = await supabase
+    .from("testimonials")
+    .update(data as TestimonialUpdate)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteTestimonial(id: string) {
+  const supabase = getSupabase();
+  const { error } = await supabase.from("testimonials").delete().eq("id", id);
   if (error) throw error;
 }

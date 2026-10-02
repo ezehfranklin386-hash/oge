@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { COMPANY, CONTACT, SOCIALS } from "@/lib/utils/constants";
+import { COMPANY, SOCIALS } from "@/lib/utils/constants";
+import { useSettings } from "@/contexts/SettingsContext";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -37,11 +38,20 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
+function TiktokIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+    </svg>
+  );
+}
+
 const socialIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   instagram: InstagramIcon,
   facebook: FacebookIcon,
   twitter: TwitterIcon,
   linkedin: LinkedinIcon,
+  tiktok: TiktokIcon,
 };
 
 const quickLinks = [
@@ -60,6 +70,17 @@ const services = [
 ];
 
 export default function Footer() {
+  const { settings } = useSettings();
+
+  // Prefer admin-managed URLs from site_settings; fall back to constants.
+  const socialLinks = [
+    { name: "instagram", url: settings.instagram || SOCIALS.instagram },
+    { name: "facebook", url: settings.facebook || SOCIALS.facebook },
+    { name: "twitter", url: settings.twitter || SOCIALS.twitter },
+    { name: "linkedin", url: settings.linkedin || SOCIALS.linkedin },
+    { name: "tiktok", url: settings.tiktok },
+  ].filter((s) => Boolean(s.url));
+
   return (
     <footer className="bg-neutral-900 text-neutral-300">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
@@ -108,12 +129,13 @@ export default function Footer() {
         <div>
           <h4 className="mb-3 text-sm font-semibold text-white">Contact Us</h4>
           <ul className="space-y-2 text-sm text-neutral-400">
-            <li>{CONTACT.phone}</li>
-            <li>{CONTACT.email}</li>
-            <li>{CONTACT.addressFull}</li>
+            <li>{settings.phone}</li>
+            {settings.phone2 && <li>{settings.phone2}</li>}
+            <li>{settings.email}</li>
+            <li>{settings.address}</li>
           </ul>
           <div className="mt-4 flex gap-3">
-            {Object.entries(SOCIALS).map(([name, url]) => {
+            {socialLinks.map(({ name, url }) => {
               const Icon = socialIcons[name];
               return (
                 <a

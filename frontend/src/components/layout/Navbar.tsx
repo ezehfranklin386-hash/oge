@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { COMPANY, whatsappLink } from "@/lib/utils/constants";
+import { COMPANY } from "@/lib/utils/constants";
+import { getWhatsappLink, useSettings } from "@/contexts/SettingsContext";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
@@ -15,6 +16,9 @@ const navLinks = [
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { settings } = useSettings();
+
+  const whatsappLink = getWhatsappLink(settings);
 
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-100 bg-white/95 backdrop-blur-md">
@@ -48,7 +52,7 @@ export default function Navbar() {
         </ul>
 
         <div className="hidden items-center gap-3 md:flex">
-          <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
             <Button variant="outline" size="sm">
               WhatsApp Us
             </Button>
@@ -93,7 +97,7 @@ export default function Navbar() {
                 ))}
               </ul>
               <div className="mt-3 flex flex-col gap-2">
-                <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">
+                <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" size="md" className="w-full">
                     WhatsApp Us
                   </Button>

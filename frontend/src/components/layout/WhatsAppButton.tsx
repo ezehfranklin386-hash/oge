@@ -1,9 +1,10 @@
-import { whatsappLink } from "@/lib/utils/constants";
+import { useSettings, getWhatsappLink } from "@/contexts/SettingsContext";
 
 export default function WhatsAppButton() {
+  const { settings } = useSettings();
   return (
     <a
-      href={whatsappLink()}
+      href={getWhatsappLink(settings)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"

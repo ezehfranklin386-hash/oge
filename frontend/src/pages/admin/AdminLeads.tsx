@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
-import { listLeads } from "@/lib/supabase/queries";
-import { getSupabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { listLeads, updateLeadStatus } from "@/lib/supabase/queries";
 import type { Lead } from "@/lib/supabase/queries";
 
 export default function AdminLeads() {
@@ -32,10 +31,8 @@ export default function AdminLeads() {
 
   async function updateStatus(id: string, status: string) {
     setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)));
-    if (!isSupabaseConfigured) return;
     try {
-      const supabase = getSupabase() as any;
-      await supabase.from("leads").update({ status }).eq("id", id);
+      await updateLeadStatus(id, status as "new" | "contacted" | "closed");
     } catch {
       // Revert on failure — refetch
       listLeads(50).then(setLeads).catch(() => {});

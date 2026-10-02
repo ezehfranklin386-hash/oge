@@ -1,5 +1,5 @@
 import { Phone, MessageCircle, Mail, MapPin } from "lucide-react";
-import { CONTACT, whatsappLink } from "@/lib/utils/constants";
+import { useSettings, getWhatsappLink } from "@/contexts/SettingsContext";
 import ContactForm from "@/components/forms/ContactForm";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -8,6 +8,7 @@ import "leaflet/dist/leaflet.css";
 const LAGOS_CENTER = [6.5244, 3.3792] as [number, number];
 
 export default function Contact() {
+  const { settings } = useSettings();
   return (
     <>
       <section className="bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 py-20">
@@ -29,28 +30,28 @@ export default function Contact() {
               <div className="rounded-xl border border-neutral-200 p-6">
                 <Phone className="h-6 w-6 text-primary" />
                 <h3 className="mt-2 font-semibold text-neutral-900">Phone</h3>
-                <a href={`tel:${CONTACT.phoneRaw}`} className="mt-1 text-sm text-primary hover:underline">
-                  {CONTACT.phone}
+                <a href={`tel:${settings.phoneRaw}`} className="mt-1 text-sm text-primary hover:underline">
+                  {settings.phone}
                 </a>
               </div>
               <div className="rounded-xl border border-neutral-200 p-6">
                 <MessageCircle className="h-6 w-6 text-primary" />
                 <h3 className="mt-2 font-semibold text-neutral-900">WhatsApp</h3>
-                <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="mt-1 text-sm text-primary hover:underline">
-                  {CONTACT.whatsapp}
+                <a href={getWhatsappLink(settings)} target="_blank" rel="noopener noreferrer" className="mt-1 text-sm text-primary hover:underline">
+                  {settings.whatsapp}
                 </a>
               </div>
               <div className="rounded-xl border border-neutral-200 p-6">
                 <Mail className="h-6 w-6 text-primary" />
                 <h3 className="mt-2 font-semibold text-neutral-900">Email</h3>
-                <a href={`mailto:${CONTACT.email}`} className="mt-1 text-sm text-primary hover:underline">
-                  {CONTACT.email}
+                <a href={`mailto:${settings.email}`} className="mt-1 text-sm text-primary hover:underline">
+                  {settings.email}
                 </a>
               </div>
               <div className="rounded-xl border border-neutral-200 p-6">
                 <MapPin className="h-6 w-6 text-primary" />
                 <h3 className="mt-2 font-semibold text-neutral-900">Address</h3>
-                <p className="mt-1 text-sm text-neutral-600">{CONTACT.addressFull}</p>
+                <p className="mt-1 text-sm text-neutral-600">{settings.address}</p>
               </div>
             </div>
 

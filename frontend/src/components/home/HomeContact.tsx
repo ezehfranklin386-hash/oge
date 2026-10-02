@@ -1,8 +1,9 @@
 import { Phone, MessageCircle, Mail, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
-import { CONTACT, whatsappLink } from "@/lib/utils/constants";
+import { useSettings, getWhatsappLink } from "@/contexts/SettingsContext";
 
 export default function HomeContact() {
+  const { settings } = useSettings();
   return (
     <section className="py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -22,10 +23,10 @@ export default function HomeContact() {
             </div>
             <h3 className="mt-3 font-semibold text-neutral-900">Phone</h3>
             <a
-              href={`tel:${CONTACT.phoneRaw}`}
+              href={`tel:${settings.phoneRaw}`}
               className="mt-1 text-sm text-primary hover:underline"
             >
-              {CONTACT.phone}
+              {settings.phone}
             </a>
           </div>
 
@@ -35,12 +36,12 @@ export default function HomeContact() {
             </div>
             <h3 className="mt-3 font-semibold text-neutral-900">WhatsApp</h3>
             <a
-              href={whatsappLink()}
+              href={getWhatsappLink(settings)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-1 text-sm text-primary hover:underline"
             >
-              {CONTACT.whatsapp}
+              {settings.whatsapp}
             </a>
           </div>
 
@@ -50,10 +51,10 @@ export default function HomeContact() {
             </div>
             <h3 className="mt-3 font-semibold text-neutral-900">Email</h3>
             <a
-              href={`mailto:${CONTACT.email}`}
+              href={`mailto:${settings.email}`}
               className="mt-1 text-sm text-primary hover:underline"
             >
-              {CONTACT.email}
+              {settings.email}
             </a>
           </div>
 
@@ -63,7 +64,7 @@ export default function HomeContact() {
             </div>
             <h3 className="mt-3 font-semibold text-neutral-900">Address</h3>
             <p className="mt-1 text-sm text-neutral-600">
-              {CONTACT.addressFull}
+              {settings.address}
             </p>
           </div>
         </div>
