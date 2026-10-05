@@ -29,7 +29,7 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
     <section className="bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
         <h2 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">What Our Clients Say</h2>
-        <p className="mt-3 text-lg text-neutral-500">Trusted by hundreds of satisfied clients</p>
+        <p className="mt-3 text-lg text-neutral-500">Trusted by clients across Lagos and the diaspora</p>
 
         <div className="mt-12 overflow-hidden rounded-2xl bg-neutral-50 p-8 sm:p-12">
           <AnimatePresence mode="wait" custom={direction}>

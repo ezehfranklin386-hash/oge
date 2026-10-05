@@ -51,8 +51,8 @@ export default function HeroSearch() {
             <span className="text-primary">Home</span> in Lagos
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-neutral-300 sm:mt-6 sm:text-xl">
-            Property sales, lettings and interior design — trusted by hundreds
-            of clients across Lagos, Nigeria.
+            Property sales, lettings and interior design — serving Nigerians
+            across Lagos and in the diaspora.
           </p>
         </div>
 

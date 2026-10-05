@@ -36,10 +36,10 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
 
 export default function Stats() {
   const stats = [
-    { label: "Properties Sold", value: 250, suffix: "+" },
-    { label: "Happy Clients", value: 400, suffix: "+" },
-    { label: "Years Experience", value: 8, suffix: "+" },
-    { label: "Areas Covered", value: 15, suffix: "+" },
+    { label: "Housing Units Delivered", value: 35, suffix: "+" },
+    { label: "Flagship Project (Units)", value: 18, suffix: "" },
+    { label: "Year Established", value: 2015, suffix: "" },
+    { label: "Long-term Target (Units)", value: 200, suffix: "+" },
   ];
 
   return (
