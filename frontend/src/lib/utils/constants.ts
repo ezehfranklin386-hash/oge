@@ -1,10 +1,10 @@
 export const COMPANY = {
-  name: "G Interior and Property Service Ltd",
+  name: "G Interior and Property Services Ltd",
   shortName: "G Interior",
   rc: "RC: 1324580",
   tagline: "Property Sales, Lettings & Interior Design in Lagos",
   description:
-    "G Interior and Property Service Ltd is a trusted real estate and interior design company based in Lagos, Nigeria. We help clients buy, sell, rent and transform residential and commercial properties.",
+    "G Interior and Property Services Ltd is a trusted real estate and interior design company based in Lagos, Nigeria. We help clients buy, sell, rent and transform residential and commercial properties.",
 } as const;
 
 export const CONTACT = {

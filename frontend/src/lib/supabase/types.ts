@@ -221,6 +221,7 @@ export interface Database {
           whatsapp: string | null;
           whatsapp_raw: string | null;
           email: string | null;
+          notify_email: string | null;
           address: string | null;
           address_full: string | null;
           instagram: string | null;
@@ -240,6 +241,7 @@ export interface Database {
           whatsapp?: string | null;
           whatsapp_raw?: string | null;
           email?: string | null;
+          notify_email?: string | null;
           address?: string | null;
           address_full?: string | null;
           instagram?: string | null;
@@ -259,6 +261,7 @@ export interface Database {
           whatsapp?: string | null;
           whatsapp_raw?: string | null;
           email?: string | null;
+          notify_email?: string | null;
           address?: string | null;
           address_full?: string | null;
           instagram?: string | null;

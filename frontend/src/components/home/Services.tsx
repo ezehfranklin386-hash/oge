@@ -2,20 +2,23 @@ import { Link } from "react-router-dom";
 
 const services = [
   {
-    title: "Property Sales",
-    description: "Buy your dream home or investment property with confidence. We handle valuation, negotiation, and documentation from start to finish.",
+    title: "Property Sales & Development",
+    description:
+      "Building houses and property development from start to finish — valuation, negotiation, legal documentation, investment guidance and flexible payment plans.",
     icon: SalesIcon,
     href: "/properties?type=sale",
   },
   {
     title: "Lettings & Leases",
-    description: "Find the perfect rental or lease your commercial space. Our team matches tenants with properties that meet their exact requirements.",
+    description:
+      "Rentals and commercial space, with property inspection before purchase, documentation assistance and maintenance support for buyers.",
     icon: LettingsIcon,
     href: "/properties?type=rent",
   },
   {
-    title: "Interior Design",
-    description: "Transform any space into a stunning living or working environment. Our designers create bespoke interiors that reflect your personality.",
+    title: "Interior Design & Finishing",
+    description:
+      "Internal and external finishing, space planning, 3D designs and visualizations, decoration and styling — tailored to your space and taste.",
     icon: InteriorIcon,
     href: "/contact",
   },
@@ -27,7 +30,14 @@ export default function Services() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">Our Services</h2>
-          <p className="mt-3 text-lg text-neutral-500">Comprehensive real estate solutions across Lagos</p>
+          <p className="mt-3 text-lg text-neutral-500">
+            Housing development and interior solutions delivered with a focus on quality, trust and value for money.
+          </p>
+          <p className="mx-auto mt-4 max-w-2xl text-neutral-600">
+            {`G Interior and Property Services Ltd combines interior finishing with housing and
+            property services — building houses, developing property from start to finish, and
+            transforming interiors for clients across Lagos and the diaspora.`}
+          </p>
         </div>
         <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
@@ -49,6 +59,13 @@ export default function Services() {
               </span>
             </Link>
           ))}
+        </div>
+        <div className="mt-10 space-y-2 text-center text-sm text-neutral-500">
+          <p>
+            Interior projects typically start from ₦20 million, depending on the owner&apos;s
+            choice. Property typically starts from ₦100 million, depending on house type.
+          </p>
+          <p>Serving Nigerians locally and in the diaspora · Building Value. Creating Homes.</p>
         </div>
       </div>
     </section>

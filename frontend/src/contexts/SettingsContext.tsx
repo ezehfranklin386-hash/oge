@@ -20,6 +20,7 @@ type SiteSettings = {
   whatsapp: string;
   whatsappRaw: string;
   email: string;
+  notifyEmail?: string;
   address: string;
   addressFull: string;
   instagram: string;
@@ -45,6 +46,7 @@ const DEFAULT_SETTINGS: SiteSettings = {
   whatsapp: "+234 000 000 0000",
   whatsappRaw: "2340000000000",
   email: "hello@ginterior.com",
+  notifyEmail: "",
   address: "Lagos, Nigeria",
   addressFull: "Lagos, Nigeria",
   ...DEFAULT_SOCIALS,
@@ -94,6 +96,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       whatsapp: row.whatsapp || DEFAULT_SETTINGS.whatsapp,
       whatsappRaw: row.whatsapp_raw || DEFAULT_SETTINGS.whatsappRaw,
       email: row.email || DEFAULT_SETTINGS.email,
+      notifyEmail: row.notify_email || DEFAULT_SETTINGS.notifyEmail,
       address: row.address || DEFAULT_SETTINGS.address,
       addressFull: row.address_full || DEFAULT_SETTINGS.addressFull,
       instagram: row.instagram || DEFAULT_SETTINGS.instagram,
@@ -171,6 +174,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         whatsapp: newSettings.whatsapp,
         whatsapp_raw: newSettings.whatsappRaw,
         email: newSettings.email,
+        notify_email: newSettings.notifyEmail || null,
         address: newSettings.address,
         address_full: newSettings.addressFull,
         instagram: newSettings.instagram || null,

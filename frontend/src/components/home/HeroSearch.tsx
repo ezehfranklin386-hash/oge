@@ -38,7 +38,7 @@ export default function HeroSearch() {
         preload="auto"
         className="absolute inset-0 z-[1] h-full w-full object-cover"
       >
-        <source src="/homepage.mp4" type="video/mp4" />
+        <source src="/homepage3.mp4" type="video/mp4" />
       </video>
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 z-[2] bg-black/40" />

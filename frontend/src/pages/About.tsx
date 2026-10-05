@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Shield, Star, Building2 } from "lucide-react";
+import { Heart, Lock, PackageCheck, Scale, Shield, Star, Wallet } from "lucide-react";
 import { COMPANY } from "@/lib/utils/constants";
 import Stats from "@/components/home/Stats";
 
@@ -11,7 +11,7 @@ export default function About() {
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">About Us</h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-neutral-300">
-            Building trust in Lagos real estate since 2016
+            Building Value. Creating Homes. — quality housing, honest service and value for money
           </p>
         </div>
       </section>
@@ -21,34 +21,71 @@ export default function About() {
         <div className="prose prose-lg max-w-none">
           <h2 className="text-2xl font-bold text-neutral-900">Our Story</h2>
           <p className="text-neutral-600 leading-relaxed">
-            {COMPANY.name} was founded with a clear mission: to make property transactions in Lagos
-            transparent, efficient, and accessible. Over the years, we have grown from a small advisory
-            firm into a full-service real estate and interior design company, serving hundreds of happy
-            clients across Lagos.
+            {COMPANY.name} was established in 2015 by Egbuleze Godwin. We began with interior
+            designing and expanded into housing development and related property services —
+            driven by one goal: to give clients real value for their money and to help solve
+            Nigeria&apos;s housing and accommodation problem.
           </p>
           <p className="text-neutral-600 leading-relaxed">
-            Our team combines deep local market knowledge with international standards of service.
-            Whether you are looking for a luxury villa in Ikoyi, a serviced apartment in Lekki, or a
-            commercial space on Victoria Island, we have the expertise and network to help you find the
-            perfect property.
+            Today we combine interior finishing with housing and property services for clients
+            across Lagos and Nigerians in the diaspora. Over three years we have delivered more
+            than 35 housing project units, including an 18-unit housing project completed in one
+            year and three months. Our long-term target is to deliver more than 200 housing units
+            in under three years, with planned expansion into Abuja and Port Harcourt — helping
+            more Nigerians become homeowners.
           </p>
         </div>
+
+        {/* Mission & Vision */}
+        <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-6">
+            <h3 className="text-lg font-semibold text-neutral-900">Our Mission</h3>
+            <p className="mt-2 text-neutral-600 leading-relaxed">
+              To deliver affordable housing units.
+            </p>
+          </div>
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-6">
+            <h3 className="text-lg font-semibold text-neutral-900">Our Vision</h3>
+            <p className="mt-2 text-neutral-600 leading-relaxed">
+              To create value for the people.
+            </p>
+          </div>
+        </div>
+
+        {/* Brand promise */}
+        <blockquote className="mt-10 border-l-4 border-primary pl-6">
+          <p className="text-xl italic leading-relaxed text-neutral-700">
+            &ldquo;We believe a property is more than a structure. It is a place to live, a
+            long-term investment and a reflection of the value a client expects to receive. Our
+            work is guided by honesty, integrity, quality and delivery.&rdquo;
+          </p>
+          <cite className="mt-3 block text-sm not-italic text-neutral-500">
+            — {COMPANY.shortName}
+          </cite>
+        </blockquote>
       </section>
 
       {/* Values */}
       <section className="bg-neutral-50 py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center text-3xl font-bold text-neutral-900">Our Values</h2>
-          <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
+          <p className="mx-auto mt-3 max-w-2xl text-center text-neutral-500">
+            The principles behind every project we take on.
+          </p>
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { title: "Integrity", desc: "Every transaction is built on honesty and transparency. We put our clients' interests first, always.", icon: Shield },
-              { title: "Excellence", desc: "We deliver the highest standard of service, from property search to final handover and beyond.", icon: Star },
-              { title: "Community", desc: "We believe in building lasting relationships, not just closing deals. Our clients become part of our family.", icon: Building2 },
+              { title: "Honesty", desc: "Clear, honest communication at every stage — no exaggerated claims, no surprises.", icon: Shield },
+              { title: "Integrity", desc: "We keep our word. Written agreements, due diligence and transparency guide every deal.", icon: Scale },
+              { title: "Quality", desc: "High-quality building structures and finishing — the standard behind every project we deliver.", icon: Star },
+              { title: "Value for Money", desc: "Quality structures and finishing that make every naira count.", icon: Wallet },
+              { title: "Client Satisfaction", desc: "Our measure of service — your confidence in the outcome matters most.", icon: Heart },
+              { title: "Trust", desc: "Earned through visible evidence of work and honest, precise guidance.", icon: Lock },
+              { title: "Delivery", desc: "We deliver what we promise, on the scope and timeline agreed.", icon: PackageCheck },
             ].map((v) => (
-              <div key={v.title} className="rounded-xl border border-neutral-200 bg-white p-8 text-center shadow-sm">
-                <v.icon className="mx-auto h-10 w-10 text-primary" />
-                <h3 className="mt-4 text-xl font-semibold text-neutral-900">{v.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-neutral-500">{v.desc}</p>
+              <div key={v.title} className="rounded-xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
+                <v.icon className="mx-auto h-9 w-9 text-primary" />
+                <h3 className="mt-4 text-lg font-semibold text-neutral-900">{v.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-500">{v.desc}</p>
               </div>
             ))}
           </div>

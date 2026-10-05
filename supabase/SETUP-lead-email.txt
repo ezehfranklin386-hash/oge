@@ -1,0 +1,113 @@
+G INTERIOR — LEAD NOTIFICATION EMAILS (BREVO)
+============================================
+
+When a client submits the contact form or a property enquiry, the lead is saved
+to the `leads` table first, then a Supabase Database Webhook calls the
+`notify-lead` Edge Function, which emails:
+  1. Every account in the `admins` table, and
+  2. The extra "Notification Email" you set in Admin -> Settings.
+
+If email sending ever fails, the lead is STILL saved — email is best-effort.
+
+
+STEP 1 — RUN THE MIGRATION (SQL Editor)
+---------------------------------------
+Supabase Dashboard -> SQL Editor -> New query -> paste and RUN:
+
+  alter table public.site_settings
+    add column if not exists notify_email text;
+
+(Also saved in this repo: supabase/migrations/20261002000001_notify_email.sql)
+
+
+STEP 2 — SET THE EDGE FUNCTION SECRETS
+--------------------------------------
+Supabase Dashboard -> Project Settings -> Edge Functions -> Secrets
+-> "Add a new secret", three of them:
+
+  BREVO_API_KEY       = <your Brevo API key>
+  BREVO_SENDER_EMAIL  = ginteriorandpropertyserviceltd@gmail.com
+  BREVO_SENDER_NAME   = G Interior
+
+*** IMPORTANT — API KEY FORMAT ***
+Brevo API keys look like:  xkeysib-1a2b3c4d5e6f...  (long, starts with xkeysib-)
+Generate one here: https://app.brevo.com/settings/keys/api
+  (Brevo Dashboard -> SMTP & API -> API Keys -> Generate API Key)
+
+If you use an SMTP password instead of an API key, Brevo will return 401 and
+no email will send. The function logs will show the error.
+
+
+STEP 3 — VERIFY THE SENDER IN BREVO
+------------------------------------
+Brevo Dashboard -> Settings -> Senders
+  -> make sure ginteriorandpropertyserviceltd@gmail.com is verified.
+Gmail addresses work, but a verified domain lands in the inbox more reliably.
+
+Free tier = 300 emails/day — plenty for lead notifications.
+
+
+STEP 4 — DEPLOY THE notify-lead FUNCTION
+----------------------------------------
+Option A — Dashboard (no CLI needed):
+  1. Supabase Dashboard -> Edge Functions -> Create a new function
+  2. Name it exactly:  notify-lead
+  3. Check "Automatically verify JWT on incoming requests"
+  4. Paste the ENTIRE contents of:
+       supabase/functions/notify-lead/index.ts
+  5. Deploy
+
+Option B — Supabase CLI (if installed):
+     supabase functions deploy notify-lead --project-ref ucxhmhdcfjvvhuiqtsvj
+
+
+STEP 5 — CREATE THE DATABASE WEBHOOK
+------------------------------------
+Supabase Dashboard -> Database -> Webhooks -> Create a new hook
+
+  Name:   lead-email-notify
+  Table:  leads
+  Events: Insert          (tick Insert only)
+  Type:   Supabase Functions
+  Function: notify-lead
+
+Save. From now on EVERY new lead (contact form + property enquiry forms)
+triggers the email automatically.
+
+
+STEP 6 — SET THE NOTIFICATION EMAIL IN ADMIN
+--------------------------------------------
+  1. Open your site, log in to the admin panel.
+  2. Go to Settings.
+  3. Under "Lead Notifications", enter the extra email address
+     (e.g. the one the admin added directly).
+  4. Save Changes.
+
+Emails then go to: all admins-table emails + this address (duplicates removed).
+
+
+STEP 7 — TEST END TO END
+------------------------
+  1. Open /contact on the site and submit a test lead.
+  2. Supabase Dashboard -> Table Editor -> leads  =>  a row with status "new".
+  3. Check BOTH inboxes (admin email + notification email).
+  4. Nothing arrived? -> Edge Functions -> notify-lead -> Logs shows why.
+
+
+TROUBLESHOOTING
+---------------
+  Brevo 401 error     -> BREVO_API_KEY is wrong. You probably used an SMTP
+                         password. Generate a real API key (starts with
+                         xkeysib-) at https://app.brevo.com/settings/keys/api
+  "Sender not valid"  -> Verify the sender address in Brevo Settings -> Senders.
+  No email at all     -> Check Edge Functions -> notify-lead -> Logs.
+  No admin email      -> admins table may be missing your row. Run:
+                           insert into public.admins (user_id, email)
+                           select id, email from auth.users
+                           where lower(email) = 'admin@ginterior.ng'
+                           on conflict (user_id) do nothing;
+  Extra address silent -> Make sure you saved the Notification Email in
+                          Admin -> Settings, and that the migration in Step 1
+                          actually ran (notify_email column must exist).
+  Email in spam       -> Verify a domain in Brevo; Gmail-only senders are
+                         treated with more suspicion by inbox providers.

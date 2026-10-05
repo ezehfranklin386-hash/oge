@@ -10,6 +10,7 @@ export default function AdminSettings() {
     phone2: settings.phone2 || "",
     whatsapp: settings.whatsapp,
     email: settings.email,
+    notifyEmail: settings.notifyEmail || "",
     address: settings.address,
     instagram: settings.instagram || "",
     facebook: settings.facebook || "",
@@ -27,6 +28,7 @@ export default function AdminSettings() {
       phone2: settings.phone2 || "",
       whatsapp: settings.whatsapp,
       email: settings.email,
+      notifyEmail: settings.notifyEmail || "",
       address: settings.address,
       instagram: settings.instagram || "",
       facebook: settings.facebook || "",
@@ -58,6 +60,10 @@ export default function AdminSettings() {
       newErrors.email = "Email address is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       newErrors.email = "Please enter a valid email address";
+    }
+
+    if (form.notifyEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.notifyEmail)) {
+      newErrors.notifyEmail = "Please enter a valid email address";
     }
 
     if (!form.address.trim()) {
@@ -157,6 +163,24 @@ export default function AdminSettings() {
                 className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
+          </div>
+        </section>
+
+        <section className="border-t border-neutral-200 pt-6">
+          <h2 className="text-lg font-semibold text-neutral-900">Lead Notifications</h2>
+          <p className="mt-1 text-sm text-neutral-500">
+            When a client submits the contact or property form, an email goes to your admin
+            accounts and to this address.
+          </p>
+          <div className="mt-4 max-w-md">
+            <label className="mb-1 block text-sm font-medium text-neutral-700">Notification Email</label>
+            <input
+              type="email"
+              value={form.notifyEmail}
+              onChange={(e) => update("notifyEmail", e.target.value)}
+              placeholder="sales@ginterior.ng"
+              className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
           </div>
         </section>
 

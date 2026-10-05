@@ -254,6 +254,7 @@ export async function updateSiteSettings(settings: {
   whatsapp?: string;
   whatsappRaw?: string;
   email?: string;
+  notifyEmail?: string;
   address?: string;
   addressFull?: string;
   instagram?: string;
@@ -273,6 +274,7 @@ export async function updateSiteSettings(settings: {
     whatsapp: settings.whatsapp,
     whatsapp_raw: settings.whatsappRaw,
     email: settings.email,
+    notify_email: settings.notifyEmail || null,
     address: settings.address,
     address_full: settings.addressFull,
     instagram: settings.instagram || null,
