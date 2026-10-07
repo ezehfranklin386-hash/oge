@@ -61,6 +61,9 @@ export default function AdminProperties() {
       // Best-effort cleanup of storage objects owned by this property.
       // isStorageUrl filters out pasted external URLs (Unsplash etc.).
       void deleteImagesByUrls((deleting.images || []).filter(isStorageUrl));
+      if (deleting.video_url && isStorageUrl(deleting.video_url)) {
+        void deleteImagesByUrls([deleting.video_url]);
+      }
     }
     setDeleting(null);
     load();

@@ -45,6 +45,7 @@ export const SEED_PROPERTIES: SeedProperty[] = [
       "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
     ],
+    video_url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
     is_featured: true,
     status: "available",
     lat: 6.4475,

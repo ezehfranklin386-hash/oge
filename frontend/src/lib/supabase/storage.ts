@@ -9,6 +9,16 @@ const JPEG_QUALITY = 0.8;
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5MB after compression
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 
+// Videos are uploaded raw (no client-side transcoding); 50MB matches the
+// Supabase free-tier per-file limit.
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"] as const;
+const VIDEO_EXTENSIONS: Record<string, string> = {
+  "video/mp4": "mp4",
+  "video/webm": "webm",
+  "video/quicktime": "mov",
+};
+
 const PUBLIC_MARKER = `/storage/v1/object/public/${IMAGE_BUCKET}/`;
 
 /** Decode + resize (aspect preserved, longest side 1600px) + re-encode as JPEG @80%.
@@ -69,6 +79,31 @@ export async function uploadImage(file: File, folder: ImageFolder): Promise<stri
     .from(IMAGE_BUCKET)
     .upload(path, blob, {
       contentType: "image/jpeg",
+      cacheControl: "31536000",
+      upsert: false,
+    });
+  if (error) throw new Error(`Upload failed: ${error.message}`);
+  const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+/** Validate → upload the raw file (no transcoding) to
+ *  `${folder}/<timestamp>-<uuid>.<ext>` → return public URL.
+ *  Throws Error with a user-facing message on invalid type, oversize,
+ *  or upload failure. */
+export async function uploadVideo(file: File, folder: ImageFolder): Promise<string> {
+  const supabase = getSupabase();
+  if (!(ALLOWED_VIDEO_TYPES as readonly string[]).includes(file.type)) {
+    throw new Error("Only MP4, WebM, or MOV videos are allowed.");
+  }
+  if (file.size > MAX_VIDEO_BYTES) {
+    throw new Error("Video must be 50MB or smaller — try a shorter or compressed clip.");
+  }
+  const path = `${folder}/${Date.now()}-${crypto.randomUUID()}.${VIDEO_EXTENSIONS[file.type]}`;
+  const { error } = await supabase.storage
+    .from(IMAGE_BUCKET)
+    .upload(path, file, {
+      contentType: file.type,
       cacheControl: "31536000",
       upsert: false,
     });

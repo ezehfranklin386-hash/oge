@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { LISTING_TYPES, LAGOS_AREAS } from "@/lib/utils/constants";
 import type { Property } from "@/lib/supabase/queries";
-import { uploadImage, isStorageUrl, deleteImagesByUrls } from "@/lib/supabase/storage";
+import { uploadImage, uploadVideo, isStorageUrl, deleteImagesByUrls } from "@/lib/supabase/storage";
+import { getYouTubeId, getVimeoId } from "@/lib/utils/video";
 
 interface PropertyFormProps {
   property?: Property | null;
@@ -26,6 +27,7 @@ const EMPTY: Partial<Property> = {
   description: "",
   features: [],
   images: [],
+  video_url: null,
   is_featured: false,
   status: "available",
   lat: null,
@@ -37,21 +39,27 @@ export default function PropertyForm({ property, open, onClose, onSave }: Proper
   const [featuresText, setFeaturesText] = useState("");
   const [uploading, setUploading] = useState(false);
   const [urlDraft, setUrlDraft] = useState("");
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoUrlDraft, setVideoUrlDraft] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const originalImagesRef = useRef<string[]>([]);
+  const originalVideoRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (property) {
       setForm({ ...property });
       setFeaturesText((property.features || []).join("\n"));
       originalImagesRef.current = property.images || [];
+      originalVideoRef.current = property.video_url ?? null;
     } else {
       setForm({ ...EMPTY });
       setFeaturesText("");
       originalImagesRef.current = [];
+      originalVideoRef.current = null;
     }
     setUrlDraft("");
+    setVideoUrlDraft("");
     setError("");
   }, [property, open]);
 
@@ -98,8 +106,35 @@ export default function PropertyForm({ property, open, onClose, onSave }: Proper
     setUploading(false);
   }
 
+  async function handleVideoFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file
+    if (!file) return;
+    setUploadingVideo(true);
+    setError("");
+    try {
+      set("video_url", await uploadVideo(file, "properties"));
+      setVideoUrlDraft("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Video upload failed");
+    } finally {
+      setUploadingVideo(false);
+    }
+  }
+
+  function addVideoUrl() {
+    const url = videoUrlDraft.trim();
+    if (!url) return;
+    set("video_url", url);
+    setVideoUrlDraft("");
+  }
+
+  function removeVideo() {
+    set("video_url", null);
+  }
+
   function requestClose() {
-    if (uploading) return;
+    if (uploading || uploadingVideo) return;
     onClose();
   }
 
@@ -113,6 +148,7 @@ export default function PropertyForm({ property, open, onClose, onSave }: Proper
         slug: form.slug || makeSlug(form.title || ""),
         features: featuresText.split("\n").map((s) => s.trim()).filter(Boolean),
         images: (form.images || []).filter(Boolean),
+        video_url: (form.video_url || "").trim() || null,
         price: Number(form.price) || 0,
         beds: Number(form.beds) || 0,
         baths: Number(form.baths) || 0,
@@ -124,6 +160,12 @@ export default function PropertyForm({ property, open, onClose, onSave }: Proper
       const newImages: string[] = data.images || [];
       const removed = originalImagesRef.current.filter((u) => isStorageUrl(u) && !newImages.includes(u));
       if (removed.length) void deleteImagesByUrls(removed);
+      // Same for a replaced/removed video — storage-owned URLs only.
+      const newVideo = data.video_url ?? null;
+      const oldVideo = originalVideoRef.current;
+      if (oldVideo && oldVideo !== newVideo && isStorageUrl(oldVideo)) {
+        void deleteImagesByUrls([oldVideo]);
+      }
       onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to save");
@@ -135,6 +177,9 @@ export default function PropertyForm({ property, open, onClose, onSave }: Proper
   if (!open) return null;
 
   const images = form.images || [];
+  const videoUrl = form.video_url || null;
+  const videoYouTubeId = videoUrl ? getYouTubeId(videoUrl) : null;
+  const videoVimeoId = videoUrl && !videoYouTubeId ? getVimeoId(videoUrl) : null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={requestClose}>
@@ -358,6 +403,79 @@ export default function PropertyForm({ property, open, onClose, onSave }: Proper
           </div>
 
           <div>
+            <label className="mb-1 block text-sm font-medium text-neutral-700">Video</label>
+
+            {videoUrl && (
+              <div className="relative mb-3 overflow-hidden rounded-lg border border-neutral-200">
+                {videoYouTubeId || videoVimeoId ? (
+                  <div className="flex items-center gap-2 bg-neutral-50 px-3 py-6 text-sm text-neutral-600">
+                    <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9A2.25 2.25 0 0013.5 5.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+                    </svg>
+                    <span className="truncate">
+                      {videoYouTubeId ? "YouTube" : "Vimeo"} video link — plays on the property page
+                    </span>
+                  </div>
+                ) : (
+                  <video src={videoUrl} controls preload="metadata" className="max-h-48 w-full bg-black" />
+                )}
+                <button
+                  type="button"
+                  onClick={removeVideo}
+                  disabled={uploading || uploadingVideo}
+                  className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white transition hover:bg-black/80"
+                  aria-label="Remove video"
+                >
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center gap-2">
+              <label
+                className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border-2 border-dashed border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-600 transition hover:border-primary hover:text-primary ${uploading || uploadingVideo ? "pointer-events-none opacity-60" : ""}`}
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9A2.25 2.25 0 0013.5 5.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+                {uploadingVideo ? "Uploading..." : "Upload video"}
+                <input
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime"
+                  disabled={uploading || uploadingVideo}
+                  onChange={handleVideoFile}
+                  className="hidden"
+                />
+              </label>
+
+              <div className="flex min-w-0 flex-1 items-center gap-2">
+                <input
+                  type="url"
+                  value={videoUrlDraft}
+                  onChange={(e) => setVideoUrlDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addVideoUrl();
+                    }
+                  }}
+                  className="w-full min-w-0 rounded-lg border border-neutral-300 px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  placeholder="...or paste a YouTube or video URL"
+                />
+                <Button type="button" variant="outline" onClick={addVideoUrl} disabled={!videoUrlDraft.trim()}>
+                  Add
+                </Button>
+              </div>
+            </div>
+
+            <p className="mt-1.5 text-xs text-neutral-500">
+              MP4, WebM or MOV up to 50MB — or paste a YouTube/Vimeo link.
+            </p>
+          </div>
+
+          <div>
             <label className="mb-1 block text-sm font-medium text-neutral-700">Features (one per line)</label>
             <textarea
               rows={3}
@@ -381,10 +499,10 @@ export default function PropertyForm({ property, open, onClose, onSave }: Proper
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div className="flex justify-end gap-3 border-t border-neutral-200 pt-4">
-            <Button type="button" variant="outline" onClick={requestClose} disabled={uploading}>
+            <Button type="button" variant="outline" onClick={requestClose} disabled={uploading || uploadingVideo}>
               Cancel
             </Button>
-            <Button type="submit" disabled={saving || uploading}>
+            <Button type="submit" disabled={saving || uploading || uploadingVideo}>
               {saving ? "Saving..." : property ? "Update Property" : "Create Property"}
             </Button>
           </div>

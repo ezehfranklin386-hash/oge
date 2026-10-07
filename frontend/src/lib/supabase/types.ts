@@ -28,6 +28,7 @@ export interface Database {
           description: string | null;
           features: string[];
           images: string[];
+          video_url: string | null;
           is_featured: boolean;
           status: string;
           lat: number | null;
@@ -53,6 +54,7 @@ export interface Database {
           description?: string | null;
           features?: string[];
           images?: string[];
+          video_url?: string | null;
           is_featured?: boolean;
           status?: string;
           lat?: number | null;
@@ -78,6 +80,7 @@ export interface Database {
           description?: string | null;
           features?: string[];
           images?: string[];
+          video_url?: string | null;
           is_featured?: boolean;
           status?: string;
           lat?: number | null;

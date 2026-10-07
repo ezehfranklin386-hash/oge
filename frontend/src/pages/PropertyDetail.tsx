@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import LeadForm from "@/components/forms/LeadForm";
 import PropertyMapWrapper from "@/components/properties/PropertyMapWrapper";
 import ImageGallery from "@/components/properties/ImageGallery";
+import PropertyVideo from "@/components/properties/PropertyVideo";
 import SimilarProperties from "@/components/properties/SimilarProperties";
 import type { Property } from "@/lib/supabase/queries";
 
@@ -93,6 +94,9 @@ export default function PropertyDetail() {
               </Badge>
             </div>
           </div>
+
+          {/* Video tour (renders nothing when the property has no video) */}
+          <PropertyVideo url={property.video_url} title={property.title} />
 
           {/* Key facts */}
           <div className="mt-6 flex flex-wrap gap-4">

@@ -43,6 +43,7 @@ export interface Property {
   description: string | null;
   features: string[];
   images: string[];
+  video_url: string | null;
   is_featured: boolean;
   status: string;
   lat: number | null;
