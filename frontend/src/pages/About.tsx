@@ -2,19 +2,15 @@ import { Link } from "react-router-dom";
 import { Heart, Lock, PackageCheck, Scale, Shield, Star, Wallet } from "lucide-react";
 import { COMPANY } from "@/lib/utils/constants";
 import Stats from "@/components/home/Stats";
+import PageHeader from "@/components/layout/PageHeader";
 
 export default function About() {
   return (
     <>
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 py-20">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">About Us</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-neutral-300">
-            Building Value. Creating Homes. — quality housing, honest service and value for money
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        title="About Us"
+        subtitle="Building Value. Creating Homes. — quality housing, honest service and value for money"
+      />
 
       {/* Story */}
       <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">

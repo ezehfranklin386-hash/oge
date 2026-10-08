@@ -1,6 +1,7 @@
 import { Phone, MessageCircle, Mail, MapPin } from "lucide-react";
 import { useSettings, getWhatsappLink } from "@/contexts/SettingsContext";
 import ContactForm from "@/components/forms/ContactForm";
+import PageHeader from "@/components/layout/PageHeader";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -11,14 +12,7 @@ export default function Contact() {
   const { settings } = useSettings();
   return (
     <>
-      <section className="bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 py-20">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">Contact Us</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-neutral-300">
-            We would love to hear from you
-          </p>
-        </div>
-      </section>
+      <PageHeader title="Contact Us" subtitle="We would love to hear from you" />
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">

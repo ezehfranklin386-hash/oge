@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Phone, MessageCircle } from "lucide-react";
 import { getAgents } from "@/lib/supabase/data";
+import PageHeader from "@/components/layout/PageHeader";
 import type { Agent } from "@/lib/supabase/queries";
 
 export default function Agents() {
@@ -13,14 +14,7 @@ export default function Agents() {
 
   return (
     <>
-      <section className="bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 py-20">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">Our Agents</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-neutral-300">
-            Meet the professionals behind our success
-          </p>
-        </div>
-      </section>
+      <PageHeader title="Our Agents" subtitle="Meet the professionals behind our success" />
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         {loading ? (
