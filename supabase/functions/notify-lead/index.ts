@@ -1,14 +1,15 @@
 // notify-lead — Database Webhook target for INSERTs into public.leads.
 //
 // Chain: contact/property form -> anon INSERT into `leads` -> Supabase
-// Database Webhook -> this function -> Brevo API -> admin inbox + the extra
-// "Notification Email" from site_settings.
+// Database Webhook -> this function -> Brevo HTTP API -> admin inbox +
+// the extra "Notification Email" from site_settings.
 //
 // Best-effort by design: the lead row is already committed before this runs,
 // so a failure here only logs — it never blocks lead capture.
 //
 // Secrets (Dashboard -> Project Settings -> Edge Functions -> Secrets):
 //   BREVO_API_KEY, BREVO_SENDER_EMAIL, BREVO_SENDER_NAME
+// Sends via https://api.brevo.com/v3/smtp/email (api-key header).
 // SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are injected automatically.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -149,25 +150,34 @@ Deno.serve(async (req) => {
     }
 
     const sourceLabel = lead.source === "contact" ? "Contact form" : "Property enquiry";
-    const brevoResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        "api-key": BREVO_API_KEY,
-        "Content-Type": "application/json",
-        accept: "application/json",
-      },
-      body: JSON.stringify({
-        sender: { email: BREVO_SENDER_EMAIL, name: BREVO_SENDER_NAME },
-        to: recipients.map((email) => ({ email })),
-        subject: `New ${sourceLabel.toLowerCase()} from ${lead.name}`,
-        htmlContent: buildEmailHtml(lead, sourceLabel),
-      }),
-    });
 
-    if (!brevoResponse.ok) {
-      const body = await brevoResponse.text();
-      console.error(`notify-lead: Brevo returned ${brevoResponse.status}:`, body);
-      return new Response(JSON.stringify({ error: "Brevo send failed" }), {
+    let apiResponse: Response;
+    try {
+      apiResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "api-key": BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sender: { name: BREVO_SENDER_NAME, email: BREVO_SENDER_EMAIL },
+          to: recipients.map((email) => ({ email })),
+          subject: `New ${sourceLabel.toLowerCase()} from ${lead.name}`,
+          htmlContent: buildEmailHtml(lead, sourceLabel),
+        }),
+      });
+    } catch (fetchError) {
+      console.error("notify-lead: Brevo API request failed:", fetchError);
+      return new Response(JSON.stringify({ error: "Email send failed" }), {
+        status: 502,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (!apiResponse.ok) {
+      const detail = await apiResponse.text();
+      console.error("notify-lead: Brevo API error:", apiResponse.status, detail);
+      return new Response(JSON.stringify({ error: "Email send failed" }), {
         status: 502,
         headers: { "Content-Type": "application/json" },
       });

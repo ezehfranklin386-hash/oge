@@ -3,6 +3,9 @@ dist/
 .vite/
 .env
 .env.local
+*token*.txt
+.claude/
+.temp/
 *.log
 .DS_Store
 *.tsbuildinfo

@@ -1,0 +1,137 @@
+G INTERIOR — LEAD NOTIFICATION (BREVO HTTP API) SETUP
+=====================================================
+Dashboard walkthrough. Project: ucxhmhdcfjvvhuiqtsvj
+Supabase: https://supabase.com/dashboard/project/ucxhmhdcfjvvhuiqtsvj
+
+The notify-lead function sends email through Brevo's HTTP API
+(https://api.brevo.com/v3/smtp/email) — not the SMTP relay.
+No Brevo domain/DNS setup: email-level sender verification only.
+
+Work through the steps in order. Do not skip Step 1 — the
+function reads the column that step creates.
+
+
+STEP 1 — RUN THE SQL MIGRATION
+------------------------------
+Dashboard -> SQL Editor -> paste and run:
+
+  alter table public.site_settings add column if not exists notify_email text;
+
+This adds the "extra notification email" column the function
+reads in Step 6.
+
+
+STEP 2 — GET A BREVO API KEY
+----------------------------
+app.brevo.com -> top-right profile -> SMTP & API -> API tab
+-> "Generate a new API key" (name it e.g. oge-notify-lead)
+
+Copy the key (shown once — it looks like xkeysib-...).
+This is NOT an SMTP key (xsmtpibib-...) and NOT your account
+password. Paste it after the = on the BREVO_API_KEY line:
+
+  C:\Users\FRANKLIN TECH\desktop\oge\supabase\.env
+
+  BREVO_API_KEY=<paste the API key here>
+
+This file is gitignored — the key never gets committed.
+For the deployed function, the same names live in:
+Project Settings -> Edge Functions -> Secrets.
+
+NOTE: an API key is ALREADY configured for this project
+(supabase/.env + Supabase Secrets) and the deployed function
+has been sending with it. You only need this step if the key
+was revoked or you want a fresh one.
+
+
+STEP 3 — DEPLOY THE notify-lead FUNCTION
+----------------------------------------
+The function source lives at:
+
+  C:\Users\FRANKLIN TECH\desktop\oge\supabase\functions\notify-lead\index.ts
+
+If deploying via Claude: just say so — the CLI is already
+logged in.
+
+If deploying via dashboard: Edge Functions -> create/open
+notify-lead -> paste the ENTIRE contents of NOTIFY-
+LEAD-FUNCTION.txt -> Deploy. If asked "Verify JWT": turn
+it OFF (Database Webhooks call with the service-role key).
+
+
+STEP 4 — CREATE THE DATABASE WEBHOOK
+------------------------------------
+Dashboard -> Database -> Webhooks -> Create a hook:
+
+  Name    = lead-email-notify
+  Table   = leads
+  Events  = Insert only (check Insert, nothing else)
+  Type    = Supabase Functions
+  Function = notify-lead
+  Method  = POST
+
+Leave "Bearer secret" alone (auto-injected). Save.
+
+
+STEP 5 — VERIFY THE SENDER IN BREVO
+-----------------------------------
+app.brevo.com -> Settings -> Senders -> SMTP & API -> Senders
+
+Confirm ginteriorandpropertyserviceltd@gmail.com shows a
+green/VERIFIED status. If unverified: click Verify and check
+that Gmail inbox for the confirmation email. Nothing works
+until this is green — the API rejects unverified From addresses.
+
+
+STEP 6 — SET THE NOTIFICATION EMAIL IN ADMIN
+--------------------------------------------
+Your site -> log into the admin panel
+-> Settings -> Lead Notifications
+-> enter the email address you want alerts sent to -> Save
+
+Admins listed in the "admins" table get these alerts
+automatically. This field adds ONE extra address.
+
+
+STEP 7 — TEST END-TO-END
+------------------------
+1. Open the live site -> /contact
+2. Submit a test message (name it "API Test")
+3. You should receive a branded
+   "New contact form from API Test" email within ~10 seconds.
+
+
+TROUBLESHOOTING
+---------------
+Symptom                          Fix
+-------------------------------  ----------------------------------
+No email, no error               Check Edge Functions -> notify-lead
+                                 -> Logs. Look for "no recipients
+                                 configured" — that means Step 6
+                                 was skipped and the admins table
+                                 is empty.
+
+Email send failed (log shows     Wrong or revoked API key — redo
+"Brevo API error: 401")          Step 2. The key starts xkeysib-...
+
+Sender not valid / email         Sender email not verified in
+rejected                         Brevo — redo Step 5.
+
+Webhook not firing               Database -> Webhooks: confirm the
+                                 hook is enabled, table is "leads",
+                                 event is Insert only, function is
+                                 notify-lead.
+
+Column notify_email does not     Redo Step 1 — the SQL migration
+exist                            must run before the function can
+                                 query it.
+
+
+SECURITY REMINDERS
+------------------
+- Brevo credentials live ONLY in supabase/.env (gitignored)
+  and in Supabase Edge Function Secrets. Never in frontend/
+  .env — VITE_ vars are compiled into the public browser
+  bundle and anyone visiting the site could steal them.
+- supabase/.env.example is a committed template — keep it
+  generic placeholders only.
