@@ -109,6 +109,8 @@ export interface Database {
           message: string | null;
           source: string;
           status: string;
+          notes: string | null;
+          follow_up_date: string | null;
           created_at: string;
         };
         Insert: {
@@ -120,6 +122,8 @@ export interface Database {
           message?: string | null;
           source?: string;
           status?: string;
+          notes?: string | null;
+          follow_up_date?: string | null;
           created_at?: string;
         };
         Update: {
@@ -131,6 +135,8 @@ export interface Database {
           message?: string | null;
           source?: string;
           status?: string;
+          notes?: string | null;
+          follow_up_date?: string | null;
           created_at?: string;
         };
         Relationships: [

@@ -86,6 +86,8 @@ export interface Lead {
   message: string | null;
   source: string;
   status: string;
+  notes: string | null;
+  follow_up_date: string | null;
   created_at: string;
   properties?: { title: string; slug: string } | null;
 }
@@ -230,6 +232,21 @@ export async function submitLead(lead: {
 export async function updateLeadStatus(id: string, status: "new" | "contacted" | "closed") {
   const supabase = getSupabase();
   const { error } = await supabase.from("leads").update({ status }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function updateLeadFollowUp(
+  id: string,
+  data: { notes?: string | null; follow_up_date?: string | null }
+) {
+  const supabase = getSupabase();
+  const { error } = await supabase.from("leads").update(data).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteLead(id: string) {
+  const supabase = getSupabase();
+  const { error } = await supabase.from("leads").delete().eq("id", id);
   if (error) throw error;
 }
 
